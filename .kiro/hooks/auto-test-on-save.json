@@ -1,0 +1,13 @@
+{
+  "name": "Auto Test on Save",
+  "description": "Automatically run tests when TypeScript files are saved",
+  "enabled": true,
+  "trigger": {
+    "type": "onFileSave",
+    "filePattern": "**/*.{ts,tsx}"
+  },
+  "action": {
+    "type": "agent",
+    "prompt": "Run the tests for the file that was just saved. If there are any failures, fix them."
+  }
+}

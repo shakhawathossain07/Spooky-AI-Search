@@ -1,0 +1,13 @@
+{
+  "name": "Update Documentation",
+  "description": "Update README when new features are added",
+  "enabled": true,
+  "trigger": {
+    "type": "manual",
+    "buttonLabel": "📝 Update Docs"
+  },
+  "action": {
+    "type": "agent",
+    "prompt": "Review the recent changes in the codebase and update the README.md file to reflect any new features, API changes, or setup instructions. Keep the documentation clear and up-to-date."
+  }
+}

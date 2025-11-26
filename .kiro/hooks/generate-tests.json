@@ -1,0 +1,13 @@
+{
+  "name": "Generate Tests",
+  "description": "Generate unit tests for components and functions",
+  "enabled": true,
+  "trigger": {
+    "type": "manual",
+    "buttonLabel": "🧪 Generate Tests"
+  },
+  "action": {
+    "type": "agent",
+    "prompt": "Generate comprehensive unit tests for the currently open file. Include tests for: 1) Happy path scenarios, 2) Edge cases, 3) Error handling, 4) Component rendering (if React), 5) User interactions. Use Vitest and React Testing Library."
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Security Audit",
+  "description": "Check for security vulnerabilities and API key exposure",
+  "enabled": true,
+  "trigger": {
+    "type": "manual",
+    "buttonLabel": "🔒 Security Check"
+  },
+  "action": {
+    "type": "agent",
+    "prompt": "Perform a security audit of the codebase. Check for: 1) Exposed API keys or secrets, 2) Insecure API calls, 3) XSS vulnerabilities, 4) Missing input validation, 5) Insecure dependencies. Report findings and fix any issues."
+  }
+}

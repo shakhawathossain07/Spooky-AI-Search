@@ -1,0 +1,13 @@
+{
+  "name": "Enhance UI/UX",
+  "description": "Suggest and implement UI/UX improvements",
+  "enabled": true,
+  "trigger": {
+    "type": "manual",
+    "buttonLabel": "✨ Enhance UI"
+  },
+  "action": {
+    "type": "agent",
+    "prompt": "Review the currently open component and suggest UI/UX improvements. Consider: 1) Accessibility (ARIA labels, keyboard navigation), 2) Responsive design, 3) Loading states, 4) Error states, 5) Animations and transitions, 6) Color contrast. Implement the most impactful improvements."
+  }
+}

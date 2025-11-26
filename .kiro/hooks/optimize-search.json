@@ -1,0 +1,13 @@
+{
+  "name": "Optimize Search Performance",
+  "description": "Analyze and optimize search functionality",
+  "enabled": true,
+  "trigger": {
+    "type": "manual",
+    "buttonLabel": "⚡ Optimize Search"
+  },
+  "action": {
+    "type": "agent",
+    "prompt": "Analyze the search.ts file and search-related components. Identify performance bottlenecks, suggest caching strategies, and implement optimizations to make searches faster and more efficient."
+  }
+}

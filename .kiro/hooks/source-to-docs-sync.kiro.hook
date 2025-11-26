@@ -1,0 +1,23 @@
+{
+  "enabled": true,
+  "name": "Source to Docs Sync",
+  "description": "Watches TypeScript source files, React components, configuration files, and other key project files. When changes are detected, triggers documentation updates in README.md or relevant documentation files to keep them in sync with the codebase.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "src/**/*.tsx",
+      "src/**/*.ts",
+      "*.config.js",
+      "*.config.ts",
+      "tsconfig.json",
+      "package.json",
+      "netlify.toml",
+      "supabase/config.toml"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Source code or configuration files have been modified. Please review the changes and update the relevant documentation:\n\n1. Check if README.md needs updates for:\n   - New features or components\n   - Changed API or usage patterns\n   - Updated configuration requirements\n   - Modified setup instructions\n\n2. Check if documentation in the supabase/ folder needs updates for:\n   - Database schema changes\n   - New migrations\n   - Configuration changes\n\n3. Check if any setup guides (AGENT_HOOKS_SETUP.md, GOOGLE_SEARCH_SETUP.md, API_TROUBLESHOOTING.md) need updates for:\n   - New dependencies\n   - Changed environment variables\n   - Updated setup steps\n\nPlease analyze the file changes and update the appropriate documentation to reflect the current state of the codebase."
+  }
+}

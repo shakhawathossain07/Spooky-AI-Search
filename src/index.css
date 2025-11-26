@@ -1,0 +1,315 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: dark;
+  background-color: #0a0a0f;
+  color: rgba(255, 255, 255, 0.87);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Custom animations for the title */
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.5;
+    filter: blur(20px);
+  }
+  50% {
+    opacity: 0.8;
+    filter: blur(30px);
+  }
+}
+
+/* Add shimmer effect to gradients */
+.animate-shimmer {
+  background-size: 200% auto;
+  animation: shimmer 3s linear infinite;
+}
+
+/* Floating animation */
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Enhanced glow */
+.glow-effect {
+  filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.6))
+          drop-shadow(0 0 40px rgba(59, 130, 246, 0.4));
+}
+
+/* Search bar animations */
+@keyframes border-flow {
+  0%, 100% {
+    border-color: rgba(168, 85, 247, 0.3);
+  }
+  33% {
+    border-color: rgba(59, 130, 246, 0.3);
+  }
+  66% {
+    border-color: rgba(34, 211, 238, 0.3);
+  }
+}
+
+@keyframes particle-float {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.75;
+  }
+  50% {
+    transform: translateY(-20px) scale(1.2);
+    opacity: 0.3;
+  }
+}
+
+/* Animated border */
+.animate-border-flow {
+  animation: border-flow 3s ease-in-out infinite;
+}
+
+/* Particle animation */
+.animate-particle {
+  animation: particle-float 3s ease-in-out infinite;
+}
+
+/* Fade in animation - used by SearchResults component */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out;
+}
+
+/* Note: SearchResults uses staggered animations via inline style animationDelay */
+
+/* Music wave animations for MusicPlayer component */
+@keyframes music-wave-1 {
+  0%, 100% {
+    height: 8px;
+  }
+  50% {
+    height: 16px;
+  }
+}
+
+@keyframes music-wave-2 {
+  0%, 100% {
+    height: 12px;
+  }
+  50% {
+    height: 20px;
+  }
+}
+
+@keyframes music-wave-3 {
+  0%, 100% {
+    height: 6px;
+  }
+  50% {
+    height: 14px;
+  }
+}
+
+.animate-music-wave-1 {
+  animation: music-wave-1 0.8s ease-in-out infinite;
+}
+
+.animate-music-wave-2 {
+  animation: music-wave-2 0.8s ease-in-out infinite 0.2s;
+}
+
+.animate-music-wave-3 {
+  animation: music-wave-3 0.8s ease-in-out infinite 0.4s;
+}
+
+/* Music wave animations */
+@keyframes music-wave-1 {
+  0%, 100% {
+    height: 8px;
+  }
+  50% {
+    height: 16px;
+  }
+}
+
+@keyframes music-wave-2 {
+  0%, 100% {
+    height: 12px;
+  }
+  50% {
+    height: 20px;
+  }
+}
+
+@keyframes music-wave-3 {
+  0%, 100% {
+    height: 6px;
+  }
+  50% {
+    height: 14px;
+  }
+}
+
+.animate-music-wave-1 {
+  animation: music-wave-1 0.8s ease-in-out infinite;
+}
+
+.animate-music-wave-2 {
+  animation: music-wave-2 0.8s ease-in-out infinite 0.2s;
+}
+
+.animate-music-wave-3 {
+  animation: music-wave-3 0.8s ease-in-out infinite 0.4s;
+}
+
+
+/* ===== EXTRAORDINARY ANIMATIONS ===== */
+
+/* Glassmorphism effect */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Gradient text animation */
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+/* Smooth scale on hover */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(139, 92, 246, 0.3);
+}
+
+/* Glow pulse */
+@keyframes glow-pulse-effect {
+  0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.4); }
+  50% { box-shadow: 0 0 40px rgba(139, 92, 246, 0.8); }
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse-effect 2s ease-in-out infinite;
+}
+
+/* Slide up animation */
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out;
+}
+
+/* Scale in animation */
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out;
+}
+
+/* Line clamp utilities */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.4);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.6);
+}
+
+/* Focus ring */
+*:focus-visible {
+  outline: 2px solid rgba(139, 92, 246, 0.5);
+  outline-offset: 2px;
+}
+
+/* Selection color */
+::selection {
+  background: rgba(139, 92, 246, 0.4);
+  color: white;
+}

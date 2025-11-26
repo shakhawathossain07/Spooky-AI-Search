@@ -1,0 +1,13 @@
+{
+  "name": "Sync Database Types",
+  "description": "Update TypeScript types when database schema changes",
+  "enabled": true,
+  "trigger": {
+    "type": "onFileSave",
+    "filePattern": "supabase/migrations/*.sql"
+  },
+  "action": {
+    "type": "agent",
+    "prompt": "A database migration file was updated. Regenerate the TypeScript types in src/types/database.ts to match the new schema. Ensure all table definitions, column types, and relationships are accurately reflected."
+  }
+}

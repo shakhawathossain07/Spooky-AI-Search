@@ -1,0 +1,74 @@
+# Supabase Configuration File
+# This file contains configuration for local development and deployment
+
+[auth]
+# Enable email/password authentication
+enabled = true
+site_url = "http://localhost:5173"
+
+# Email authentication settings
+[auth.email]
+enable_signup = true
+enable_confirmations = true
+double_confirm_changes = true
+secure_password_change = true
+
+# Anonymous authentication settings
+[auth.anonymous]
+enabled = true
+
+# JWT settings
+[auth.jwt]
+expiry = 3600
+secret = "your-jwt-secret-here"
+
+# External OAuth providers (can be enabled later)
+[auth.external.google]
+enabled = false
+
+[auth.external.github]
+enabled = false
+
+# Database settings
+[db]
+# PostgreSQL version
+major_version = 15
+
+# Connection pooling
+[db.pooler]
+enabled = true
+port = 6543
+pool_mode = "transaction"
+default_pool_size = 20
+max_client_conn = 100
+
+# Storage settings
+[storage]
+# File size limits (in bytes)
+file_size_limit = 52428800  # 50MB
+
+# Allowed MIME types for uploads
+[storage.buckets.user-uploads]
+public = false
+file_size_limit = 52428800
+allowed_mime_types = ["image/jpeg", "image/png", "image/gif", "image/webp", "application/pdf", "text/plain"]
+
+# API settings
+[api]
+enabled = true
+port = 54321
+max_rows = 1000
+
+# Realtime settings
+[realtime]
+enabled = true
+max_connections = 100
+max_channels_per_client = 100
+
+# Analytics settings
+[analytics]
+enabled = true
+
+# Edge Functions settings
+[edge_runtime]
+enabled = true
