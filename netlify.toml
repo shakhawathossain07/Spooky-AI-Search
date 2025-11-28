@@ -5,6 +5,8 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  # Skip secrets scanning for VITE_ env vars (they are intentionally inlined by Vite)
+  SECRETS_SCAN_OMIT_KEYS = "VITE_GEMINI_API_KEY,VITE_GOOGLE_SEARCH_API_KEY,VITE_SEARCH_API_PROVIDER,VITE_SUPABASE_URL,VITE_SUPABASE_ANON_KEY,VITE_REDIS_URL,VITE_REDIS_TOKEN"
 
 [[redirects]]
   from = "/*"
