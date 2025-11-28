@@ -96,7 +96,8 @@ spooky-ai-search/
 │   │   ├── LoadingScreen.tsx       # Loading animation
 │   │   ├── DynamicBackground.tsx   # Dynamic gradient effects
 │   │   ├── EffectsShowcase.tsx     # Visual effects demo
-│   │   └── AnimusEffect.tsx        # Special animations
+│   │   ├── AnimusEffect.tsx        # Special animations
+│   │   └── ErrorBoundary.tsx       # React error boundary
 │   ├── lib/
 │   │   ├── search.ts               # Google Search & Gemini AI
 │   │   └── supabase.ts             # Database client

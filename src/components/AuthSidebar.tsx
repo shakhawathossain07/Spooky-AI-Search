@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { supabase } from '../lib/supabase';
 import { User } from '@supabase/supabase-js';
 import { GoogleIcon, LogoutIcon, UserIcon, HistoryIcon, BookmarkIcon, CloseIcon } from './Icons';
@@ -14,7 +14,7 @@ interface UserStats {
   recentSearches: { query: string; timestamp: string }[];
 }
 
-export default function AuthSidebar({ isOpen, onClose }: AuthSidebarProps) {
+function AuthSidebarComponent({ isOpen, onClose }: AuthSidebarProps) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -77,7 +77,7 @@ export default function AuthSidebar({ isOpen, onClose }: AuthSidebarProps) {
     }
   };
 
-  const handleGoogleSignIn = async () => {
+  const handleGoogleSignIn = useCallback(async () => {
     setLoading(true);
     setError(null);
     
@@ -95,9 +95,9 @@ export default function AuthSidebar({ isOpen, onClose }: AuthSidebarProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const handleSignOut = async () => {
+  const handleSignOut = useCallback(async () => {
     setLoading(true);
     try {
       await supabase.auth.signOut();
@@ -107,7 +107,7 @@ export default function AuthSidebar({ isOpen, onClose }: AuthSidebarProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -125,7 +125,7 @@ export default function AuthSidebar({ isOpen, onClose }: AuthSidebarProps) {
       )}
       
       {/* Sidebar */}
-      <div className={`fixed top-0 right-0 h-full w-80 bg-gray-900/95 backdrop-blur-xl border-l border-purple-500/30 z-50 transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+      <div className={`fixed top-0 left-0 h-full w-80 bg-gray-900/95 backdrop-blur-xl border-r border-purple-500/30 z-50 transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-800">
@@ -287,6 +287,9 @@ export default function AuthSidebar({ isOpen, onClose }: AuthSidebarProps) {
     </>
   );
 }
+
+const AuthSidebar = memo(AuthSidebarComponent);
+export default AuthSidebar;
 
 // Export helper to save search to Supabase
 export async function saveSearchToSupabase(query: string, results?: unknown, aiSummary?: string) {

@@ -53,15 +53,13 @@ export default function VoiceSearch({ onTranscript, onSearch }: VoiceSearchProps
   // Animate visualizer bars when listening
   useEffect(() => {
     if (isListening) {
-      const animate = () => {
-        setVisualizerBars(prev => prev.map(() => Math.random() * 25 + 5));
-        animationRef.current = requestAnimationFrame(animate);
-      };
-      // Slow down animation
       const interval = setInterval(() => {
         setVisualizerBars(prev => prev.map(() => Math.random() * 25 + 5));
       }, 100);
-      return () => clearInterval(interval);
+      return () => {
+        clearInterval(interval);
+        setVisualizerBars(Array(12).fill(5));
+      };
     }
   }, [isListening]);
 

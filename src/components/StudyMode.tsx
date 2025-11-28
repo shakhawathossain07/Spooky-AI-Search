@@ -1,9 +1,6 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, memo } from 'react';
 import { performSearch, type SearchResponse } from '../lib/search';
 import { StudyIcon, UploadIcon, DocumentIcon, ResearchIcon, AIIcon, CheckIcon, IdeaIcon, ExternalLinkIcon, LoadingIcon } from './Icons';
-
-// Import PDF.js worker as URL for Vite
-import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 
 interface StudyTopic {
   topic: string;
@@ -17,7 +14,7 @@ interface ExtractedContent {
   pageCount: number;
 }
 
-export default function StudyMode() {
+function StudyModeComponent() {
   const [pdfText, setPdfText] = useState<string>('');
   const [fileName, setFileName] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -34,8 +31,9 @@ export default function StudyMode() {
     // Dynamic import of PDF.js to avoid SSR issues
     const pdfjsLib = await import('pdfjs-dist');
     
-    // Set up worker using Vite's ?url import (works in both dev and prod)
-    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+    // Set up worker dynamically
+    const workerUrl = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url);
+    pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl.href;
     
     setProcessingStatus('Reading PDF file...');
     const arrayBuffer = await file.arrayBuffer();
@@ -562,3 +560,6 @@ JSON array:`;
     </div>
   );
 }
+
+const StudyMode = memo(StudyModeComponent);
+export default StudyMode;

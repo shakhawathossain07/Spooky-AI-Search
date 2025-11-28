@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback, memo } from 'react';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -11,13 +11,14 @@ interface AIChatProps {
   query?: string;
 }
 
-export default function AIChat({ context, query }: AIChatProps) {
+function AIChatComponent({ context, query }: AIChatProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -38,20 +39,36 @@ export default function AIChat({ context, query }: AIChatProps) {
         timestamp: new Date(),
       }]);
     }
-  }, [isOpen, query]);
+  }, [isOpen, query, messages.length]);
 
-  const sendMessage = async () => {
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
+
+  const sendMessage = useCallback(async () => {
     if (!input.trim() || isLoading) return;
 
+    const userInput = input.trim();
     const userMessage: Message = {
       role: 'user',
-      content: input,
+      content: userInput,
       timestamp: new Date(),
     };
 
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
+
+    // Cancel any pending request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
 
     try {
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
@@ -67,7 +84,7 @@ ${query ? `The user searched for: "${query}"\n\n` : ''}
 Previous conversation:
 ${conversationHistory}
 
-User: ${input}
+User: ${userInput}
 
 Provide a helpful, concise response. Be friendly and informative.`;
 
@@ -80,6 +97,7 @@ Provide a helpful, concise response. Be friendly and informative.`;
             contents: [{ parts: [{ text: prompt }] }],
             generationConfig: { temperature: 0.8, maxOutputTokens: 500 },
           }),
+          signal: abortControllerRef.current.signal,
         }
       );
 
@@ -93,6 +111,9 @@ Provide a helpful, concise response. Be friendly and informative.`;
         timestamp: new Date(),
       }]);
     } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        return; // Request was cancelled, don't show error
+      }
       setMessages(prev => [...prev, {
         role: 'assistant',
         content: "Sorry, I encountered an error. Please try again.",
@@ -101,7 +122,7 @@ Provide a helpful, concise response. Be friendly and informative.`;
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [input, isLoading, messages, context, query]);
 
   return (
     <>
@@ -227,3 +248,6 @@ Provide a helpful, concise response. Be friendly and informative.`;
     </>
   );
 }
+
+const AIChat = memo(AIChatComponent);
+export default AIChat;

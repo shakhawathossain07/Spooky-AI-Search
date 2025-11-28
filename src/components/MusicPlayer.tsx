@@ -15,17 +15,20 @@ export default function MusicPlayer() {
     const audio = new Audio(musicUrl);
     audio.loop = true;
     audio.volume = volume;
+    audio.preload = 'none'; // Don't preload until user wants to play
     audioRef.current = audio;
 
     // Load saved preference - default to OFF to respect browser autoplay restrictions
     const savedPreference = localStorage.getItem('musicEnabled');
     const hasSeenNotification = localStorage.getItem('musicNotificationSeen');
     
+    let notificationTimeout: ReturnType<typeof setTimeout>;
+    let hideTimeout: ReturnType<typeof setTimeout>;
+    
     if (savedPreference === 'true') {
       // User previously enabled music
       setIsPlaying(true);
-      audio.play().catch(err => {
-        console.log('Autoplay prevented by browser:', err);
+      audio.play().catch(() => {
         // If autoplay fails, reset to off state
         setIsPlaying(false);
       });
@@ -35,18 +38,21 @@ export default function MusicPlayer() {
       
       // Show notification for first-time visitors (only once)
       if (!hasSeenNotification) {
-        setTimeout(() => {
+        notificationTimeout = setTimeout(() => {
           setShowNotification(true);
           localStorage.setItem('musicNotificationSeen', 'true');
-        }, 2000); // Show after 2 seconds
+        }, 2000);
         
-        setTimeout(() => setShowNotification(false), 8000); // Hide after 8 seconds total
+        hideTimeout = setTimeout(() => setShowNotification(false), 8000);
       }
     }
 
     return () => {
+      clearTimeout(notificationTimeout);
+      clearTimeout(hideTimeout);
       audio.pause();
       audio.src = '';
+      audioRef.current = null;
     };
   }, []);
 

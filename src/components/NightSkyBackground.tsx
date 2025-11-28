@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, memo } from 'react';
 
 interface Star {
   x: number;
@@ -50,9 +50,9 @@ interface Particle {
   hue: number;
 }
 
-export default function NightSkyBackground() {
+function NightSkyBackgroundComponent() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | null>(null);
   const starsRef = useRef<Star[]>([]);
   const firefliesRef = useRef<Firefly[]>([]);
   const shootingStarsRef = useRef<ShootingStar[]>([]);
@@ -60,6 +60,7 @@ export default function NightSkyBackground() {
   const particlesRef = useRef<Particle[]>([]);
   const timeRef = useRef(0);
   const mouseRef = useRef({ x: 0, y: 0 });
+  const isRunningRef = useRef(true);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -139,6 +140,8 @@ export default function NightSkyBackground() {
     window.addEventListener('mousemove', handleMouse);
 
     const animate = () => {
+      if (!isRunningRef.current) return;
+      
       timeRef.current += 0.016;
       const time = timeRef.current;
 
@@ -179,12 +182,17 @@ export default function NightSkyBackground() {
       animationRef.current = requestAnimationFrame(animate);
     };
 
+    isRunningRef.current = true;
     animate();
 
     return () => {
+      isRunningRef.current = false;
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', handleMouse);
-      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
     };
   }, []);
 
@@ -597,3 +605,7 @@ function drawOwls(
     ctx.restore();
   });
 }
+
+// Memoize the component to prevent unnecessary re-renders
+const NightSkyBackground = memo(NightSkyBackgroundComponent);
+export default NightSkyBackground;

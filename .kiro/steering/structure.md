@@ -47,6 +47,7 @@ spooky-ai-search/
 - `DynamicBackground.tsx` - Dynamic gradient background effects
 - `EffectsShowcase.tsx` - Visual effects demonstration component
 - `AnimusEffect.tsx` - Special animation effects overlay
+- `ErrorBoundary.tsx` - React error boundary for graceful error handling with themed fallback UI
 
 ### Library Modules
 - `lib/search.ts` - Search functionality integrating Google Programmable Search Engine (text, images, videos) and Gemini AI for summaries, with credibility scoring and performance tracking

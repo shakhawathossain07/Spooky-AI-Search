@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import NightSkyBackground from './components/NightSkyBackground'
 import SearchResults from './components/SearchResults'
 import MusicPlayer from './components/MusicPlayer'
@@ -45,12 +45,25 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleSearch = async (searchQuery?: string) => {
-    const q = searchQuery || query;
-    if (!q.trim()) return;
+  // Debounce ref to prevent rapid searches
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastSearchRef = useRef<string>('');
+
+  const handleSearch = useCallback(async (searchQuery?: string) => {
+    const q = (searchQuery || query).trim();
+    if (!q) return;
+    
+    // Prevent duplicate searches
+    if (q === lastSearchRef.current && searchData) return;
+    
+    // Clear any pending search
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
     
     setIsSearching(true);
     setError(null);
+    lastSearchRef.current = q;
     
     try {
       const results = await performSearch(q);
@@ -71,28 +84,29 @@ function App() {
     } finally {
       setIsSearching(false);
     }
-  };
+  }, [query, searchData, searchCount, user]);
 
-  const handleNewSearch = () => {
+  const handleNewSearch = useCallback(() => {
     setSearchData(null);
     setQuery('');
     setError(null);
-  };
+    lastSearchRef.current = '';
+  }, []);
 
-  const handleQuestionClick = (question: string) => {
+  const handleQuestionClick = useCallback((question: string) => {
     setQuery(question);
     handleSearch(question);
-  };
+  }, [handleSearch]);
 
-  const handleVoiceTranscript = (text: string) => {
+  const handleVoiceTranscript = useCallback((text: string) => {
     setQuery(text);
-  };
+  }, []);
 
-  const handleVoiceSearch = () => {
+  const handleVoiceSearch = useCallback(() => {
     if (query.trim()) {
       handleSearch();
     }
-  };
+  }, [query, handleSearch]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -107,16 +121,11 @@ function App() {
       if (e.key === 'Escape' && searchData) {
         handleNewSearch();
       }
-      
-      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && query.trim()) {
-        e.preventDefault();
-        handleSearch();
-      }
     };
     
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [query, searchData]);
+  }, [searchData]);
 
   return (
     <div className="min-h-screen bg-spooky-dark text-white relative overflow-hidden">
@@ -132,10 +141,10 @@ function App() {
         query={searchData?.query}
       />
       
-      {/* User/Login Button - Fixed Position */}
+      {/* User/Login Button - Fixed Position (Left Side) */}
       <button
         onClick={() => setSidebarOpen(true)}
-        className="fixed top-4 right-4 z-30 flex items-center gap-2 px-4 py-2 bg-gray-900/60 backdrop-blur-xl rounded-full border border-purple-500/30 hover:border-purple-500/60 transition-all duration-300 hover:scale-105 group"
+        className="fixed top-4 left-4 z-[100] flex items-center gap-2 px-4 py-2 bg-gray-900/80 backdrop-blur-xl rounded-full border border-purple-500/30 hover:border-purple-500/60 transition-all duration-300 hover:scale-105 group shadow-lg"
       >
         {user ? (
           <>

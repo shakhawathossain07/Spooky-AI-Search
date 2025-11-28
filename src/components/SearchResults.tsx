@@ -1,3 +1,4 @@
+import { useState, useCallback } from 'react';
 import type { SearchResponse, SearchResult } from '../lib/search';
 import RelatedQuestions from './RelatedQuestions';
 
@@ -7,6 +8,11 @@ interface SearchResultsProps {
   onQuestionClick?: (question: string) => void;
 }
 
+interface Toast {
+  message: string;
+  type: 'success' | 'error';
+}
+
 function getCredibilityBadge(score: number) {
   if (score >= 80) return { color: 'green', label: 'High Trust', icon: '✓' };
   if (score >= 60) return { color: 'yellow', label: 'Medium Trust', icon: '~' };
@@ -14,14 +20,26 @@ function getCredibilityBadge(score: number) {
 }
 
 export default function SearchResults({ searchData, onNewSearch, onQuestionClick }: SearchResultsProps) {
-  const handleCopyLink = (link: string, e: React.MouseEvent) => {
-    e.preventDefault();
-    navigator.clipboard.writeText(link);
-    alert('Link copied to clipboard!');
-  };
+  const [toast, setToast] = useState<Toast | null>(null);
 
-  const handleShare = async (result: SearchResult, e: React.MouseEvent) => {
+  const showToast = useCallback((message: string, type: 'success' | 'error' = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  }, []);
+
+  const handleCopyLink = useCallback((link: string, e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    navigator.clipboard.writeText(link).then(() => {
+      showToast('Link copied to clipboard!');
+    }).catch(() => {
+      showToast('Failed to copy link', 'error');
+    });
+  }, [showToast]);
+
+  const handleShare = useCallback(async (result: SearchResult, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (navigator.share) {
       try {
         await navigator.share({
@@ -29,23 +47,45 @@ export default function SearchResults({ searchData, onNewSearch, onQuestionClick
           text: result.snippet,
           url: result.link,
         });
-      } catch (err) {
-        console.log('Share cancelled');
+      } catch {
+        // User cancelled or share failed silently
       }
     } else {
       handleCopyLink(result.link, e);
     }
-  };
+  }, [handleCopyLink]);
 
-  const handleSave = (result: SearchResult, e: React.MouseEvent) => {
+  const handleSave = useCallback((result: SearchResult, e: React.MouseEvent) => {
     e.preventDefault();
-    const saved = JSON.parse(localStorage.getItem('savedResults') || '[]');
-    saved.push({ ...result, savedAt: new Date().toISOString() });
-    localStorage.setItem('savedResults', JSON.stringify(saved));
-    alert('Result saved! Check your browser storage.');
-  };
+    e.stopPropagation();
+    try {
+      const saved = JSON.parse(localStorage.getItem('savedResults') || '[]');
+      // Check if already saved
+      const exists = saved.some((s: SearchResult) => s.link === result.link);
+      if (exists) {
+        showToast('Already saved!');
+        return;
+      }
+      saved.push({ ...result, savedAt: new Date().toISOString() });
+      localStorage.setItem('savedResults', JSON.stringify(saved));
+      showToast('Result saved!');
+    } catch {
+      showToast('Failed to save', 'error');
+    }
+  }, [showToast]);
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-[200] px-4 py-2 rounded-lg shadow-lg animate-fade-in ${
+          toast.type === 'success' 
+            ? 'bg-green-500/90 text-white' 
+            : 'bg-red-500/90 text-white'
+        }`}>
+          {toast.message}
+        </div>
+      )}
+      
       {/* Enhanced AI Summary Card */}
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 via-blue-600/10 to-cyan-600/10 rounded-2xl blur-xl animate-pulse"></div>
