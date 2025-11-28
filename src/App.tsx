@@ -7,9 +7,12 @@ import VoiceSearch from './components/VoiceSearch'
 import AIChat from './components/AIChat'
 import SearchHistory, { saveToHistory } from './components/SearchHistory'
 import QuickActions from './components/QuickActions'
+import AuthSidebar, { saveSearchToSupabase } from './components/AuthSidebar'
 import Logo from './components/Logo'
-import { SearchIcon, StudyIcon, LoadingIcon, GhostIcon } from './components/Icons'
+import { SearchIcon, StudyIcon, LoadingIcon, GhostIcon, UserIcon } from './components/Icons'
 import { performSearch, type SearchResponse } from './lib/search'
+import { supabase } from './lib/supabase'
+import { User } from '@supabase/supabase-js'
 
 type AppMode = 'search' | 'study';
 
@@ -20,11 +23,26 @@ function App() {
   const [isSearching, setIsSearching] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [searchCount, setSearchCount] = useState(0)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [user, setUser] = useState<User | null>(null)
 
   // Load search count from localStorage
   useEffect(() => {
     const count = localStorage.getItem('totalSearches');
     if (count) setSearchCount(parseInt(count));
+  }, []);
+
+  // Listen for auth state changes
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const handleSearch = async (searchQuery?: string) => {
@@ -43,6 +61,11 @@ function App() {
       const newCount = searchCount + 1;
       setSearchCount(newCount);
       localStorage.setItem('totalSearches', newCount.toString());
+      
+      // Save to Supabase if user is logged in
+      if (user) {
+        saveSearchToSupabase(q, results.results, results.aiSummary);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -100,11 +123,44 @@ function App() {
       <NightSkyBackground />
       <MusicPlayer />
       
+      {/* Auth Sidebar */}
+      <AuthSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      
       {/* AI Chat Assistant */}
       <AIChat 
         context={searchData?.aiSummary} 
         query={searchData?.query}
       />
+      
+      {/* User/Login Button - Fixed Position */}
+      <button
+        onClick={() => setSidebarOpen(true)}
+        className="fixed top-4 right-4 z-30 flex items-center gap-2 px-4 py-2 bg-gray-900/60 backdrop-blur-xl rounded-full border border-purple-500/30 hover:border-purple-500/60 transition-all duration-300 hover:scale-105 group"
+      >
+        {user ? (
+          <>
+            {user.user_metadata?.avatar_url ? (
+              <img 
+                src={user.user_metadata.avatar_url} 
+                alt="Profile" 
+                className="w-7 h-7 rounded-full border border-purple-500"
+              />
+            ) : (
+              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
+                <UserIcon size={16} />
+              </div>
+            )}
+            <span className="text-sm text-gray-300 hidden sm:inline">
+              {user.user_metadata?.full_name?.split(' ')[0] || 'Account'}
+            </span>
+          </>
+        ) : (
+          <>
+            <UserIcon size={20} />
+            <span className="text-sm text-gray-300">Sign In</span>
+          </>
+        )}
+      </button>
       
       <div className="container mx-auto px-4 py-8 relative" style={{ zIndex: 10 }}>
         {/* Mode Toggle */}
