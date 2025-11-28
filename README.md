@@ -2,6 +2,8 @@
 
 Next-generation AI-powered search engine built with React, TypeScript, Netlify, and Supabase.
 
+<img width="959" height="412" alt="image" src="https://github.com/user-attachments/assets/e59e7b97-ee4b-4d29-b077-7cb82ba8690d" />
+
 ## Features
 
 - 🔍 **AI-Powered Search**: Google Programmable Search Engine integration with real-time results
