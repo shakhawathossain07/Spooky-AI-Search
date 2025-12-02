@@ -12,6 +12,7 @@ Spooky AI Search is a next-generation AI-powered search engine that combines Goo
 - **Enhanced UI**: Beautiful search results with gradient effects and animations
 - **Spooky Theme**: Night sky background with animated owls and fireflies
 - **Ambient Music**: Optional meditation music player with volume control and persistent preferences
+- **Focus Timer**: Pomodoro-style timer with animated tree growth - stay focused or your tree dies!
 - **Interactive Results**: Thumbnails, badges, save/share/copy buttons with Web Share API
 - **Credibility Scoring**: Algorithmic trust scores (0-100) with visual badges
 - **Trust Indicators**: High/Medium/Low trust badges with icons (✓/~/?)

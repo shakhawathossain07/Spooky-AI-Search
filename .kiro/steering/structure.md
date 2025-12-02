@@ -9,6 +9,7 @@ spooky-ai-search/
 │   │   ├── AnimusEffect.tsx
 │   │   ├── DynamicBackground.tsx
 │   │   ├── EffectsShowcase.tsx
+│   │   ├── FocusTimer.tsx
 │   │   ├── LoadingScreen.tsx
 │   │   ├── NightSkyBackground.tsx
 │   │   └── SearchResults.tsx
@@ -42,6 +43,7 @@ spooky-ai-search/
 - `SearchResults.tsx` - Enhanced search results display with AI summary, related questions, image gallery, and interactive result cards with save/share functionality
 - `RelatedQuestions.tsx` - AI-generated follow-up questions component with interactive buttons
 - `MusicPlayer.tsx` - Ambient meditation music player with play/pause controls, volume adjustment, and persistent preferences
+- `FocusTimer.tsx` - Pomodoro-style focus timer with animated tree growth canvas, tab detection (tree dies if user leaves), stats tracking
 - `NightSkyBackground.tsx` - Animated canvas background with owls, fireflies, stars, and moon
 - `LoadingScreen.tsx` - Loading state UI with animated spinner
 - `DynamicBackground.tsx` - Dynamic gradient background effects

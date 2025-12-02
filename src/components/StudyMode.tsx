@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, memo } from 'react';
 import { performSearch, type SearchResponse } from '../lib/search';
 import { StudyIcon, UploadIcon, DocumentIcon, ResearchIcon, AIIcon, CheckIcon, IdeaIcon, ExternalLinkIcon, LoadingIcon } from './Icons';
+import FocusTimer from './FocusTimer';
 
 interface StudyTopic {
   topic: string;
@@ -22,6 +23,7 @@ function StudyModeComponent() {
   const [topics, setTopics] = useState<StudyTopic[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [pageCount, setPageCount] = useState<number>(0);
+  const [activeTab, setActiveTab] = useState<'research' | 'focus'>('research');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Extract text from PDF using PDF.js with dynamic import
@@ -281,10 +283,48 @@ JSON array:`;
           <AIIcon size={48} />
         </div>
         <p className="text-gray-400 text-lg">
-          Upload your lecture slides or study materials to get AI-powered research assistance
+          Upload study materials for AI research or use the Focus Timer to stay productive
         </p>
       </div>
 
+      {/* Tab Switcher */}
+      <div className="flex justify-center mb-8">
+        <div className="inline-flex bg-gray-900/60 backdrop-blur-xl rounded-full p-1 border border-purple-500/30">
+          <button
+            onClick={() => setActiveTab('research')}
+            className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 flex items-center gap-2 ${
+              activeTab === 'research'
+                ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            <ResearchIcon size={18} /> Research
+          </button>
+          <button
+            onClick={() => setActiveTab('focus')}
+            className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 flex items-center gap-2 ${
+              activeTab === 'focus'
+                ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            <span>🌳</span> Focus Timer
+          </button>
+        </div>
+      </div>
+
+      {/* Focus Timer Tab */}
+      {activeTab === 'focus' && (
+        <div className="max-w-md mx-auto">
+          <FocusTimer onComplete={() => {
+            // Optional: Show celebration or notification
+          }} />
+        </div>
+      )}
+
+      {/* Research Tab */}
+      {activeTab === 'research' && (
+        <>
       {/* Upload Section */}
       {!pdfText && (
         <div className="mb-8">
@@ -556,6 +596,8 @@ JSON array:`;
             </p>
           </div>
         </div>
+      )}
+        </>
       )}
     </div>
   );

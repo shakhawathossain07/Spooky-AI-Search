@@ -14,6 +14,7 @@ Next-generation AI-powered search engine built with React, TypeScript, Netlify, 
 - 🎨 **Spooky Theme**: Night sky background with flying owls and glowing fireflies
 - 🎵 **Ambient Music**: Optional meditation music player with volume control
 - 📚 **Study Mode**: Upload PDFs/lecture slides for AI-powered exam preparation
+- 🌳 **Focus Timer**: Pomodoro-style timer with growing tree visualization - stay focused or your tree dies!
 - 📊 **Rich Results**: Thumbnails, credibility badges, and interactive action buttons
 - 🔒 **Trust Indicators**: Credibility scoring with High/Medium/Low trust badges
 - 🎓 **Domain Badges**: Special indicators for academic and government sources
@@ -92,6 +93,7 @@ spooky-ai-search/
 │   │   ├── RelatedQuestions.tsx    # AI-generated follow-up questions
 │   │   ├── StudyMode.tsx           # PDF upload & AI study assistant
 │   │   ├── MusicPlayer.tsx         # Ambient music player
+│   │   ├── FocusTimer.tsx          # Pomodoro timer with tree growth
 │   │   ├── NightSkyBackground.tsx  # Animated night sky with owls
 │   │   ├── LoadingScreen.tsx       # Loading animation
 │   │   ├── DynamicBackground.tsx   # Dynamic gradient effects
@@ -146,6 +148,17 @@ Optional ambient music player featuring:
 - Animated music wave visualization
 - Persistent user preference via localStorage
 - Glass-morphism design with purple accents
+
+### FocusTimer Component
+Pomodoro-style focus timer with gamification:
+- Animated tree growth visualization on HTML5 canvas
+- Tree states: seed (idle), growing, complete (with flowers), dead
+- Tab/window focus detection - tree dies if user leaves!
+- Configurable duration (5-120 minutes) with preset buttons
+- Progress bar and percentage display
+- Stats tracking via localStorage (trees grown, total focus time)
+- Visual feedback with status overlays and animations
+- "Give Up" option during active sessions
 
 ### NightSkyBackground Component
 Animated canvas background featuring:
