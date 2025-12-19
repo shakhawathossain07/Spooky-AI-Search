@@ -5,7 +5,7 @@ Spooky AI Search is a next-generation AI-powered search engine that combines Goo
 ## Core Features (Implemented)
 
 - **AI-Powered Search**: Real-time results from Google Programmable Search Engine
-- **AI Summaries**: Comprehensive analysis using Google Gemini 1.5 Flash
+- **AI Summaries**: Comprehensive analysis using Google Gemini 2.0 Flash
 - **Related Questions**: AI-generated follow-up questions for deeper exploration
 - **Image Search**: Related images displayed in interactive gallery
 - **Video Search**: Related video results with thumbnails and duration (ready for display)

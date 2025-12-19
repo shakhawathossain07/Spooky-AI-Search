@@ -15,6 +15,13 @@ interface ExtractedContent {
   pageCount: number;
 }
 
+interface StructuredContent {
+  headings: string[];
+  keyTerms: string[];
+  sections: string[];
+  stats: { pages: number; words: number };
+}
+
 function StudyModeComponent() {
   const [pdfText, setPdfText] = useState<string>('');
   const [fileName, setFileName] = useState<string>('');
@@ -61,37 +68,132 @@ function StudyModeComponent() {
     return { text: fullText.trim(), pageCount: totalPages };
   }, []);
 
-  // Extract topics using Gemini AI
+  // Local fallback: Extract topics without AI when API is unavailable
+  const extractTopicsLocally = useCallback((structured: StructuredContent): string[] => {
+    const topics: string[] = [];
+    
+    // Use headings as primary topics (they're usually the main concepts)
+    structured.headings.forEach(heading => {
+      if (heading.length > 5 && heading.length < 80) {
+        topics.push(heading);
+      }
+    });
+    
+    // Add key terms that look like important concepts
+    structured.keyTerms.forEach(term => {
+      if (term.length > 5 && !topics.some(t => t.toLowerCase().includes(term.toLowerCase()))) {
+        topics.push(term);
+      }
+    });
+    
+    // Deduplicate and limit
+    const uniqueTopics = [...new Set(topics)]
+      .filter(t => t.split(/\s+/).length >= 2) // At least 2 words
+      .slice(0, 7);
+    
+    // If we don't have enough, extract noun phrases from sections
+    if (uniqueTopics.length < 5) {
+      structured.sections.forEach(section => {
+        // Extract capitalized phrases as potential topics
+        const matches = section.match(/[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+/g) || [];
+        matches.forEach(match => {
+          if (!uniqueTopics.includes(match) && uniqueTopics.length < 7) {
+            uniqueTopics.push(match);
+          }
+        });
+      });
+    }
+    
+    return uniqueTopics.length > 0 ? uniqueTopics : ['General Study Topics from Document'];
+  }, []);
+
+  // Preprocess PDF text into structured JSON format for efficient AI processing
+  const preprocessToStructuredJSON = useCallback((text: string): StructuredContent => {
+    // Clean text
+    const cleanText = text.replace(/\s+/g, ' ').trim();
+    const words = cleanText.split(/\s+/);
+    
+    // Extract potential headings (short lines, often capitalized or numbered)
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    const headings = lines
+      .filter(line => {
+        const wordCount = line.split(/\s+/).length;
+        const isShort = wordCount >= 2 && wordCount <= 12;
+        const hasCapitals = /^[A-Z0-9]/.test(line);
+        const isNumbered = /^(\d+[\.\):]|\•|\-|Chapter|Section|Part)/i.test(line);
+        return isShort && (hasCapitals || isNumbered) && !/[.!?]$/.test(line);
+      })
+      .slice(0, 15) // Max 15 headings
+      .map(h => h.replace(/^[\d\.\)\:\•\-]+\s*/, '').trim());
+    
+    // Extract key terms (capitalized phrases, technical terms, acronyms)
+    const termPatterns = [
+      /\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+\b/g, // Multi-word proper nouns
+      /\b[A-Z]{2,6}\b/g, // Acronyms
+      /\b[A-Z][a-z]+(?:tion|ment|ity|ism|ology|graphy)\b/g, // Technical suffixes
+    ];
+    
+    const allTerms = new Set<string>();
+    termPatterns.forEach(pattern => {
+      const matches = cleanText.match(pattern) || [];
+      matches.forEach(m => {
+        if (m.length > 3 && m.length < 40) allTerms.add(m);
+      });
+    });
+    const keyTerms = Array.from(allTerms).slice(0, 20);
+    
+    // Extract key sentences (first sentence of paragraphs, definition-like sentences)
+    const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 50);
+    const sections: string[] = [];
+    
+    paragraphs.slice(0, 10).forEach(para => {
+      const sentences = para.split(/[.!?]+/).filter(s => s.trim().length > 30);
+      if (sentences.length > 0) {
+        // Take first sentence (topic sentence)
+        const firstSentence = sentences[0].replace(/\s+/g, ' ').trim().slice(0, 150);
+        if (firstSentence.length > 30) {
+          sections.push(firstSentence);
+        }
+      }
+    });
+    
+    return {
+      headings: [...new Set(headings)],
+      keyTerms,
+      sections: sections.slice(0, 8),
+      stats: { pages: 0, words: words.length }
+    };
+  }, []);
+
+  // Extract topics using Gemini AI with structured JSON input
   const extractTopicsWithAI = useCallback(async (text: string): Promise<string[]> => {
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
     if (!apiKey) {
       throw new Error('Gemini API key not configured. Please add VITE_GEMINI_API_KEY to your .env file.');
     }
 
-    setProcessingStatus('Analyzing content with AI...');
+    setProcessingStatus('Preprocessing content...');
 
-    // Truncate text to avoid token limits
-    const truncatedText = text.slice(0, 15000);
+    // Preprocess text into structured JSON format (much more token-efficient)
+    const structured = preprocessToStructuredJSON(text);
+    
+    // Create compact JSON payload - this is ~80% smaller than raw text
+    const contentJSON = JSON.stringify({
+      h: structured.headings,      // headings
+      t: structured.keyTerms,      // key terms
+      s: structured.sections,      // key sentences
+      w: structured.stats.words    // word count for context
+    });
 
-    const prompt = `You are an educational content analyzer. Analyze this study material and extract 5-8 key topics that a student should research further to understand the material better.
+    setProcessingStatus('Analyzing with AI...');
 
-Focus on:
-- Main concepts and theories
-- Important terms and definitions
-- Key figures, events, or processes
-- Practical applications
+    // Ultra-compact prompt with JSON input
+    const prompt = `Given this document structure (h=headings, t=terms, s=sections, w=wordcount):
+${contentJSON}
 
-Content to analyze:
-"""
-${truncatedText}
-"""
+Extract 5-7 study topics. Return JSON array only: ["topic1","topic2",...]`;
 
-Return ONLY a valid JSON array of topic strings. Each topic should be specific enough to search for but broad enough to find good resources.
-
-Example format: ["Topic 1", "Topic 2", "Topic 3"]
-
-JSON array:`;
-
+    // Use same model as search.ts for consistency
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
       {
@@ -100,9 +202,9 @@ JSON array:`;
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 1000,
-            topP: 0.95,
+            temperature: 0.5,
+            maxOutputTokens: 300, // Reduced - we only need a short JSON array
+            topP: 0.8,
           },
           safetySettings: [
             { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
@@ -117,10 +219,11 @@ JSON array:`;
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       console.error('Gemini API error:', errorData);
-      throw new Error(
-        errorData.error?.message || 
-        `Gemini API error: ${response.status} ${response.statusText}`
-      );
+      
+      // FALLBACK: Extract topics locally when API fails (quota exceeded, etc.)
+      console.log('Using local topic extraction fallback...');
+      setProcessingStatus('Using local analysis (API unavailable)...');
+      return extractTopicsLocally(structured);
     }
 
     const data = await response.json();

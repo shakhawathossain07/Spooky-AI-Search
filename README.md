@@ -7,7 +7,7 @@ Next-generation AI-powered search engine built with React, TypeScript, Netlify, 
 ## Features
 
 - 🔍 **AI-Powered Search**: Google Programmable Search Engine integration with real-time results
-- 🧠 **AI Summaries**: Comprehensive analysis powered by Google Gemini 1.5 Flash
+- 🧠 **AI Summaries**: Comprehensive analysis powered by Google Gemini AI
 - 💡 **Related Questions**: AI-generated follow-up questions for deeper exploration
 - 🖼️ **Image Search**: Related images displayed in an interactive gallery
 - ✨ **Enhanced UI**: Beautiful gradient effects, animations, and hover interactions

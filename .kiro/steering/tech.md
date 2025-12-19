@@ -9,7 +9,7 @@
 ## Backend & Services
 - **Hosting**: Netlify (with Edge Functions support)
 - **Database**: Supabase (PostgreSQL with pgvector)
-- **AI**: Google Gemini 1.5 Flash API
+- **AI**: Google Gemini 2.0 Flash API
 - **Search**: Google Programmable Search Engine API
 - **Cache**: Upstash Redis (optional)
 

@@ -4,7 +4,7 @@ import SearchResults from './components/SearchResults'
 import MusicPlayer from './components/MusicPlayer'
 import StudyMode from './components/StudyMode'
 import VoiceSearch from './components/VoiceSearch'
-import AIChat from './components/AIChat'
+
 import SearchHistory, { saveToHistory } from './components/SearchHistory'
 import QuickActions from './components/QuickActions'
 import AuthSidebar, { saveSearchToSupabase } from './components/AuthSidebar'
@@ -135,11 +135,7 @@ function App() {
       {/* Auth Sidebar */}
       <AuthSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       
-      {/* AI Chat Assistant */}
-      <AIChat 
-        context={searchData?.aiSummary} 
-        query={searchData?.query}
-      />
+
       
       {/* User/Login Button - Fixed Position (Left Side) */}
       <button
